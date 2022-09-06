@@ -573,6 +573,9 @@ struct Accessor : public Object {
     template <class T>
     void ExtractData(T *&outData);
 
+    template <typename T1, typename T2>
+    void WriteData(size_t count, const void *src_buffer, unsigned int src_numComponent);
+
     void WriteData(size_t count, const void *src_buffer, size_t src_stride);
     void WriteSparseValues(size_t count, const void *src_data, size_t src_dataStride);
     void WriteSparseIndices(size_t count, const void *src_idx, size_t src_idxStride);

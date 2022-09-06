@@ -431,8 +431,54 @@ static inline bool CheckValidFacesIndices(aiFace *faces, unsigned nFaces, unsign
 #endif // ASSIMP_BUILD_DEBUG
 
 template <typename T>
+Tangent *GetTangentForType(Ref<Accessor> input) {
+    T (*vector4)[4];
+    input->ExtractData(vector4);
+    auto output = new Tangent[input->count];
+
+    for (size_t i = 0; i < input->count; i++) {
+        auto v = vector4[i];
+        Tangent t;
+        t.xyz = aiVector3D(v[0], v[1], v[2]);
+        t.w = v[3];
+        output[i] = t;
+    }
+    delete[] vector4;
+    return output;
+}
+
+template <typename T>
+aiVector3D *GetVector3dForType(Ref<Accessor> input) {
+    aiVector3t<T> *vector3;
+    input->ExtractData(vector3);
+    auto output = new aiVector3D[input->count];
+
+    for (size_t i = 0; i < input->count; i++) {
+        auto v = vector3[i];
+        output[i] = aiVector3D(v.x, v.y, v.z);
+    }
+    delete[] vector3;
+    return output;
+}
+
+template <typename T>
+aiVector2D *GetVector2dForType(Ref<Accessor> input) {
+    aiVector2t<T> *vector2;
+    input->ExtractData(vector2);
+    auto output = new aiVector2D[input->count];
+
+    for (size_t i = 0; i < input->count; i++) {
+        auto v = vector2[i];
+        output[i] = aiVector2D(v.x, v.y);
+    }
+    delete[] vector2;
+    return output;
+}
+
+template <typename T>
 aiColor4D *GetVertexColorsForType(Ref<Accessor> input) {
-    constexpr float max = std::numeric_limits<T>::max();
+    //constexpr float max = std::numeric_limits<T>::max();
+    float max = typeid(T) == typeid(float) ? 1.0f : std::numeric_limits<T>::max();
     aiColor4t<T> *colors;
     input->ExtractData(colors);
     auto output = new aiColor4D[input->count];
@@ -494,14 +540,22 @@ void glTF2Importer::ImportMeshes(glTF2::Asset &r) {
 
             if (!attr.position.empty() && attr.position[0]) {
                 aim->mNumVertices = static_cast<unsigned int>(attr.position[0]->count);
+#if ASSIMP_DOUBLE_PRECISION
+                aim->mVertices = GetVector3dForType<float>(attr.position[0]);
+#else
                 attr.position[0]->ExtractData(aim->mVertices);
+#endif
             }
 
             if (!attr.normal.empty() && attr.normal[0]) {
                 if (attr.normal[0]->count != aim->mNumVertices) {
                     DefaultLogger::get()->warn("Normal count in mesh \"", mesh.name, "\" does not match the vertex count, normals ignored.");
                 } else {
+#if ASSIMP_DOUBLE_PRECISION
+                    aim->mNormals = GetVector3dForType<float>(attr.normal[0]);
+#else
                     attr.normal[0]->ExtractData(aim->mNormals);
+#endif
 
                     // only extract tangents if normals are present
                     if (!attr.tangent.empty() && attr.tangent[0]) {
@@ -511,8 +565,11 @@ void glTF2Importer::ImportMeshes(glTF2::Asset &r) {
                             // generate bitangents from normals and tangents according to spec
                             Tangent *tangents = nullptr;
 
+#if ASSIMP_DOUBLE_PRECISION
+                            tangents = GetTangentForType<float>(attr.tangent[0]);
+#else
                             attr.tangent[0]->ExtractData(tangents);
-
+#endif
                             aim->mTangents = new aiVector3D[aim->mNumVertices];
                             aim->mBitangents = new aiVector3D[aim->mNumVertices];
 
@@ -536,7 +593,11 @@ void glTF2Importer::ImportMeshes(glTF2::Asset &r) {
 
                 auto componentType = attr.color[c]->componentType;
                 if (componentType == glTF2::ComponentType_FLOAT) {
+#if ASSIMP_DOUBLE_PRECISION
+                    aim->mColors[c] = GetVertexColorsForType<float>(attr.color[c]);
+#else
                     attr.color[c]->ExtractData(aim->mColors[c]);
+#endif
                 } else {
                     if (componentType == glTF2::ComponentType_UNSIGNED_BYTE) {
                         aim->mColors[c] = GetVertexColorsForType<unsigned char>(attr.color[c]);
@@ -557,7 +618,11 @@ void glTF2Importer::ImportMeshes(glTF2::Asset &r) {
                     continue;
                 }
 
+#if ASSIMP_DOUBLE_PRECISION
+                aim->mTextureCoords[tc] = GetVector3dForType<float>(attr.texcoord[tc]);
+#else
                 attr.texcoord[tc]->ExtractData(aim->mTextureCoords[tc]);
+#endif
                 aim->mNumUVComponents[tc] = attr.texcoord[tc]->GetNumComponents();
 
                 aiVector3D *values = aim->mTextureCoords[tc];

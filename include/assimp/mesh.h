@@ -749,14 +749,14 @@ struct aiMesh {
      */
     unsigned int mMethod;
 
-    /**
-     *  The bounding box.
-     */
-    C_STRUCT aiAABB mAABB;
+    ///**
+    // *  The bounding box.
+    // */
+    //C_STRUCT aiAABB mAABB;
 
-    /** Vertex UV stream names. Pointer to array of size AI_MAX_NUMBER_OF_TEXTURECOORDS
-     */
-    C_STRUCT aiString **mTextureCoordsNames;
+    ///** Vertex UV stream names. Pointer to array of size AI_MAX_NUMBER_OF_TEXTURECOORDS
+    // */
+    //C_STRUCT aiString **mTextureCoordsNames;
 
 #ifdef __cplusplus
 
@@ -778,9 +778,9 @@ struct aiMesh {
               mMaterialIndex(0),
               mNumAnimMeshes(0),
               mAnimMeshes(nullptr),
-              mMethod(0),
-              mAABB(),
-              mTextureCoordsNames(nullptr) {
+              mMethod(0){
+              //mAABB(),
+              //mTextureCoordsNames(nullptr)
         for (unsigned int a = 0; a < AI_MAX_NUMBER_OF_TEXTURECOORDS; ++a) {
             mNumUVComponents[a] = 0;
             mTextureCoords[a] = nullptr;
@@ -801,12 +801,12 @@ struct aiMesh {
             delete[] mTextureCoords[a];
         }
 
-        if (mTextureCoordsNames) {
+        /*if (mTextureCoordsNames) {
             for (unsigned int a = 0; a < AI_MAX_NUMBER_OF_TEXTURECOORDS; a++) {
                 delete mTextureCoordsNames[a];
             }
             delete[] mTextureCoordsNames;
-        }
+        }*/
 
         for (unsigned int a = 0; a < AI_MAX_NUMBER_OF_COLOR_SETS; a++) {
             delete[] mColors[a];
@@ -893,51 +893,51 @@ struct aiMesh {
         return mBones != nullptr && mNumBones > 0;
     }
 
-    //! Check whether the mesh contains a texture coordinate set name
-    //! \param pIndex Index of the texture coordinates set
-    bool HasTextureCoordsName(unsigned int pIndex) const {
-        if (mTextureCoordsNames == nullptr || pIndex >= AI_MAX_NUMBER_OF_TEXTURECOORDS) {
-            return false;
-        }
-        return mTextureCoordsNames[pIndex] != nullptr;
-    }
+    ////! Check whether the mesh contains a texture coordinate set name
+    ////! \param pIndex Index of the texture coordinates set
+    //bool HasTextureCoordsName(unsigned int pIndex) const {
+    //    if (mTextureCoordsNames == nullptr || pIndex >= AI_MAX_NUMBER_OF_TEXTURECOORDS) {
+    //        return false;
+    //    }
+    //    return mTextureCoordsNames[pIndex] != nullptr;
+    //}
 
-    //! Set a texture coordinate set name
-    //! \param pIndex Index of the texture coordinates set
-    //! \param texCoordsName name of the texture coordinate set
-    void SetTextureCoordsName(unsigned int pIndex, const aiString &texCoordsName) {
-        if (pIndex >= AI_MAX_NUMBER_OF_TEXTURECOORDS) {
-            return;
-        }
+    ////! Set a texture coordinate set name
+    ////! \param pIndex Index of the texture coordinates set
+    ////! \param texCoordsName name of the texture coordinate set
+    //void SetTextureCoordsName(unsigned int pIndex, const aiString &texCoordsName) {
+    //    if (pIndex >= AI_MAX_NUMBER_OF_TEXTURECOORDS) {
+    //        return;
+    //    }
 
-        if (mTextureCoordsNames == nullptr) {
-            // Construct and null-init array
-            mTextureCoordsNames = new aiString *[AI_MAX_NUMBER_OF_TEXTURECOORDS] {};
-        }
+    //    if (mTextureCoordsNames == nullptr) {
+    //        // Construct and null-init array
+    //        mTextureCoordsNames = new aiString *[AI_MAX_NUMBER_OF_TEXTURECOORDS] {};
+    //    }
 
-        if (texCoordsName.length == 0) {
-            delete mTextureCoordsNames[pIndex];
-            mTextureCoordsNames[pIndex] = nullptr;
-            return;
-        }
+    //    if (texCoordsName.length == 0) {
+    //        delete mTextureCoordsNames[pIndex];
+    //        mTextureCoordsNames[pIndex] = nullptr;
+    //        return;
+    //    }
 
-        if (mTextureCoordsNames[pIndex] == nullptr) {
-            mTextureCoordsNames[pIndex] = new aiString(texCoordsName);
-            return;
-        }
+    //    if (mTextureCoordsNames[pIndex] == nullptr) {
+    //        mTextureCoordsNames[pIndex] = new aiString(texCoordsName);
+    //        return;
+    //    }
 
-        *mTextureCoordsNames[pIndex] = texCoordsName;
-    }
+    //    *mTextureCoordsNames[pIndex] = texCoordsName;
+    //}
 
-    //! Get a texture coordinate set name
-    //! \param pIndex Index of the texture coordinates set
-    const aiString *GetTextureCoordsName(unsigned int pIndex) const {
-        if (mTextureCoordsNames == nullptr || pIndex >= AI_MAX_NUMBER_OF_TEXTURECOORDS) {
-            return nullptr;
-        }
+    ////! Get a texture coordinate set name
+    ////! \param pIndex Index of the texture coordinates set
+    //const aiString *GetTextureCoordsName(unsigned int pIndex) const {
+    //    if (mTextureCoordsNames == nullptr || pIndex >= AI_MAX_NUMBER_OF_TEXTURECOORDS) {
+    //        return nullptr;
+    //    }
 
-        return mTextureCoordsNames[pIndex];
-    }
+    //    return mTextureCoordsNames[pIndex];
+    //}
 
 #endif // __cplusplus
 };

@@ -151,7 +151,6 @@ int Assimp_Export(const char *const *params, unsigned int num) {
     if (!scene) {
         return AssimpCmdExportError::FailedToImportModel;
     }
-
     // derive the final file name
     out += "." + outext;
 

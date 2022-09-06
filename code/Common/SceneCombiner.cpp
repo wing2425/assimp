@@ -1102,13 +1102,13 @@ void SceneCombiner::Copy(aiMesh **_dest, const aiMesh *src) {
     // make a deep copy of all blend shapes
     CopyPtrArray(dest->mAnimMeshes, dest->mAnimMeshes, dest->mNumAnimMeshes);
 
-    // make a deep copy of all texture coordinate names
-    if (src->mTextureCoordsNames != nullptr) {
-        dest->mTextureCoordsNames = new aiString *[AI_MAX_NUMBER_OF_TEXTURECOORDS] {};
-        for (unsigned int i = 0; i < AI_MAX_NUMBER_OF_TEXTURECOORDS; ++i) {
-            Copy(&dest->mTextureCoordsNames[i], src->mTextureCoordsNames[i]);
-        }
-    }
+    //// make a deep copy of all texture coordinate names
+    //if (src->mTextureCoordsNames != nullptr) {
+    //    dest->mTextureCoordsNames = new aiString *[AI_MAX_NUMBER_OF_TEXTURECOORDS] {};
+    //    for (unsigned int i = 0; i < AI_MAX_NUMBER_OF_TEXTURECOORDS; ++i) {
+    //        Copy(&dest->mTextureCoordsNames[i], src->mTextureCoordsNames[i]);
+    //    }
+    //}
 }
 
 // ------------------------------------------------------------------------------------------------

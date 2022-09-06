@@ -969,10 +969,11 @@ void Accessor::ExtractData(T *&outData) {
     }
 
     const size_t elemSize = GetElementSize();
+    const size_t numOfComponents = GetNumComponents();
+    const size_t bytesPerComponent = GetBytesPerComponent();
     const size_t totalSize = elemSize * count;
 
     const size_t stride = GetStride();
-
     const size_t targetElemSize = sizeof(T);
 
     if (elemSize > targetElemSize) {
@@ -988,8 +989,24 @@ void Accessor::ExtractData(T *&outData) {
     if (stride == elemSize && targetElemSize == elemSize) {
         memcpy(outData, data, totalSize);
     } else {
-        for (size_t i = 0; i < count; ++i) {
+        /*for (size_t i = 0; i < count; ++i) {
             memcpy(outData + i, data + i * stride, elemSize);
+        }*/
+        if (numOfComponents == 1 || stride == elemSize) {
+            for (size_t i = 0; i < count; ++i) {
+                memcpy(outData + i, data + i * stride, elemSize);
+            }
+        } else {
+
+            throw DeadlyImportError("GLTF: 잘못된 메모리 카피", getContextForErrorMessages(id, name));
+            /*uint8_t *bytes = (uint8_t *)outData;
+            size_t targetBytesPerComponent = targetElemSize / numOfComponents;
+            size_t offset = targetBytesPerComponent - bytesPerComponent;
+            for (size_t i = 0; i < count; ++i) {
+                for (size_t j = 0; j < numOfComponents; j++) {
+                    memcpy(bytes + offset + i * targetElemSize + j * targetBytesPerComponent, data + i * stride + j * bytesPerComponent, bytesPerComponent);
+                }
+            }*/
         }
     }
 }
@@ -998,13 +1015,41 @@ inline void Accessor::WriteData(size_t _count, const void *src_buffer, size_t sr
     uint8_t *buffer_ptr = bufferView->buffer->GetPointer();
     size_t offset = byteOffset + bufferView->byteOffset;
 
-    size_t dst_stride = GetNumComponents() * GetBytesPerComponent();
+    size_t dst_stride = (size_t)GetNumComponents() * GetBytesPerComponent();
 
     const uint8_t *src = reinterpret_cast<const uint8_t *>(src_buffer);
     uint8_t *dst = reinterpret_cast<uint8_t *>(buffer_ptr + offset);
 
     ai_assert(dst + _count * dst_stride <= buffer_ptr + bufferView->buffer->byteLength);
     CopyData(_count, src, src_stride, dst, dst_stride);
+}
+
+template <typename T1, typename T2>
+void Accessor::WriteData(size_t _count, const void *src_buffer, unsigned int src_numComponent) {
+    uint8_t *buffer_ptr = bufferView->buffer->GetPointer();
+    size_t offset = byteOffset + bufferView->byteOffset;
+
+    size_t numComponent = GetNumComponents();
+    #if DEBUG
+    size_t dst_stride = (size_t)GetNumComponents() * GetBytesPerComponent();
+    #endif
+
+    const T1 *src = reinterpret_cast<const T1 *>(src_buffer);
+    T2 *dst = reinterpret_cast<T2 *>(buffer_ptr + offset);
+
+    #if DEBUG
+    ai_assert(buffer_ptr + offset + _count * dst_stride <= buffer_ptr + bufferView->buffer->byteLength);
+    #endif
+
+    for (int i = 0; i < _count; i++, src += src_numComponent, dst += numComponent) {
+        for (int j = 0; j < numComponent; j++) {
+            dst[j] = src[j];
+        }
+    }
+
+   /* T2 *test = reinterpret_cast<T2 *>(buffer_ptr + offset);
+    test[0] = test[0];*/
+    //CopyData(_count, src, src_stride, dst, dst_stride);
 }
 
 inline void Accessor::WriteSparseValues(size_t _count, const void *src_data, size_t src_dataStride) {

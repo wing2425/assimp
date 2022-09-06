@@ -240,7 +240,11 @@ inline void SetAccessorRange(ComponentType compType, Ref<Accessor> acc, void *da
         SetAccessorRange<unsigned int>(acc, data, count, numCompsIn, numCompsOut);
         return;
     case ComponentType_FLOAT:
+#if ASSIMP_DOUBLE_PRECISION
+        SetAccessorRange<double>(acc, data, count, numCompsIn, numCompsOut);
+#else
         SetAccessorRange<float>(acc, data, count, numCompsIn, numCompsOut);
+#endif
         return;
     case ComponentType_BYTE:
         SetAccessorRange<int8_t>(acc, data, count, numCompsIn, numCompsOut);
@@ -440,7 +444,15 @@ inline Ref<Accessor> ExportData(Asset &a, std::string &meshName, Ref<Buffer> &bu
     SetAccessorRange(compType, acc, data, count, numCompsIn, numCompsOut);
 
     // copy the data
+#if ASSIMP_DOUBLE_PRECISION
+    if (compType == ComponentType_FLOAT) {
+        acc->WriteData<double, float>(count, data, numCompsIn);
+    } else {
+        acc->WriteData(count, data, numCompsIn * bytesPerComp);
+    }
+#else
     acc->WriteData(count, data, numCompsIn * bytesPerComp);
+#endif
 
     return acc;
 }
@@ -827,7 +839,7 @@ void glTF2Exporter::ExportMaterials() {
         }
 
         // glTFv2 is either PBR or Unlit
-        aiShadingMode shadingMode = aiShadingMode_PBR_BRDF;
+        aiShadingMode shadingMode = aiShadingMode_Unlit; //aiShadingMode_PBR_BRDF;
         mat.Get(AI_MATKEY_SHADING_MODEL, shadingMode);
         if (shadingMode == aiShadingMode_Unlit) {
             mAsset->extensionsUsed.KHR_materials_unlit = true;

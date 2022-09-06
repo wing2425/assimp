@@ -108,15 +108,15 @@ AI_FORCE_INLINE aiReturn aiMaterial::Get(const char* pKey,unsigned int type,
 }
 
 // ---------------------------------------------------------------------------
-template <typename Type>
+template <typename T>
 AI_FORCE_INLINE aiReturn aiMaterial::Get(const char* pKey,unsigned int type,
-        unsigned int idx,Type& pOut) const {
+        unsigned int idx, T &pOut) const {
     const aiMaterialProperty* prop;
     const aiReturn ret = ::aiGetMaterialProperty(this,pKey,type,idx,
         (const aiMaterialProperty**)&prop);
     if ( AI_SUCCESS == ret ) {
 
-        if (prop->mDataLength < sizeof(Type)) {
+        if (prop->mDataLength < sizeof(T)) {
             return AI_FAILURE;
         }
 
@@ -124,7 +124,7 @@ AI_FORCE_INLINE aiReturn aiMaterial::Get(const char* pKey,unsigned int type,
             return AI_FAILURE;
         }
 
-        ::memcpy( &pOut, prop->mData, sizeof( Type ) );
+        ::memcpy(&pOut, prop->mData, sizeof(T));
     }
     return ret;
 }

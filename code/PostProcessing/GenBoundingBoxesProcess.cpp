@@ -103,10 +103,10 @@ void GenBoundingBoxesProcess::Execute(aiScene* pScene) {
             continue;
         }
 
-        aiVector3D min(999999, 999999, 999999), max(-999999, -999999, -999999);
+        /*aiVector3D min(999999, 999999, 999999), max(-999999, -999999, -999999);
         checkMesh(mesh, min, max);
         mesh->mAABB.mMin = min;
-        mesh->mAABB.mMax = max;
+        mesh->mAABB.mMax = max;*/
     }
 }
 

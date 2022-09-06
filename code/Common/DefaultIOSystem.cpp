@@ -67,10 +67,10 @@ static std::wstring Utf8ToWide(const char *in) {
     if (nullptr == in) {
         return wdummy;
     }
-    int size = MultiByteToWideChar(CP_UTF8, 0, in, -1, nullptr, 0);
+    int size = MultiByteToWideChar(CP_ACP, 0, in, -1, nullptr, 0);
     // size includes terminating null; std::wstring adds null automatically
     std::wstring out(static_cast<size_t>(size) - 1, L'\0');
-    MultiByteToWideChar(CP_UTF8, 0, in, -1, &out[0], size);
+    MultiByteToWideChar(CP_ACP, 0, in, -1, &out[0], size);
 
     return out;
 }
@@ -81,10 +81,10 @@ static std::string WideToUtf8(const wchar_t *in) {
     if (nullptr == in) {
         return dummy;
     }
-    int size = WideCharToMultiByte(CP_UTF8, 0, in, -1, nullptr, 0, nullptr, nullptr);
+    int size = WideCharToMultiByte(CP_ACP, 0, in, -1, nullptr, 0, nullptr, nullptr);
     // size includes terminating null; std::string adds null automatically
     std::string out(static_cast<size_t>(size) - 1, '\0');
-    WideCharToMultiByte(CP_UTF8, 0, in, -1, &out[0], size, nullptr, nullptr);
+    WideCharToMultiByte(CP_ACP, 0, in, -1, &out[0], size, nullptr, nullptr);
 
     return out;
 }

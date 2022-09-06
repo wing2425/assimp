@@ -556,9 +556,10 @@ int Assimp_TestBatchLoad (
 	const char* const* params,
 	unsigned int num)
 {
-	for(unsigned int i = 0; i < num; ++i) {
+	for(unsigned int i = 0; i < num - num + 1; ++i) {
 		globalImporter->ReadFile(params[i],aiProcessPreset_TargetRealtime_MaxQuality);
 		// we're totally silent. scene destructs automatically.
 	}
+
 	return AssimpCmdError::Success;
 }
